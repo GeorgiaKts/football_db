@@ -67,6 +67,7 @@ Run order:
 📍 http://localhost:8080
 
 🧠 Authors
+
 Georgia Katsarou
 
 Ioanna Kalpourtzi
@@ -74,4 +75,4 @@ Ioanna Kalpourtzi
 Thanasis Koukouliatas
 
 📎 Notes
-The project was developed as part of an academic assignment.
+The project was developed as part of an academic assignment of the department of computer science and engineering, University of Ioannina.
