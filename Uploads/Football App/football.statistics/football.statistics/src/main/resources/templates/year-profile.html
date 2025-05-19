@@ -27,21 +27,24 @@
         .navbar-custom .nav-link:hover .bi-house-door {
             color: yellow; /* Change icon color on hover */
         }
+        body {
+        padding-top: 80px;
+        }
     </style>
 
 </head>
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light navbar-custom">
+<nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top">
     <div class="container-fluid">
         <!-- Logo Section -->
         <div class="navbar-brand">
             <img src="/images/logo.png" alt="Logo" width="40" height="40" style="margin-right: 10px;">
-            Football Statistics
+            Footballistics
         </div>
 
-        <!-- Navbar Links-->
+        <!-- Navbar Links -->
         <ul class="navbar-nav ms-auto">
             <li class="nav-item">
                 <!-- Home Icon Button -->
@@ -52,6 +55,7 @@
         </ul>
     </div>
 </nav>
+
 
 <div class="container mt-4 text-center">
     <h1 class="mb-3">Results For Year <span th:text="${selectedYear}"></span></h1>
