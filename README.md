@@ -36,7 +36,6 @@ ETL steps include:
 
 - Encoding fixes & whitespace trimming
 - Converting missing values to `NULL`
-- Deduplicating rows
 - ISO code enrichment for countries
 
 Run order:
