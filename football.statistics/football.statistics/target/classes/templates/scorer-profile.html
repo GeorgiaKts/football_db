@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Scorer Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Custom CSS for Navbar -->
+    <style>
+        .navbar-custom {
+            background-color: black; /* background color */
+        }
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link {
+            color: white; /* White text */
+        }
+        .navbar-custom .nav-link:hover {
+            color: #ffcc00; /* Yellow text on hover */
+        }
+
+        /* Custom style for the icon */
+        .navbar-custom .bi-house-door {
+            color: white; /* Change icon color*/
+            font-size: 40px; /* Custom size  */
+        }
+
+        .navbar-custom .nav-link:hover .bi-house-door {
+            color: yellow; /* Change icon color on hover */
+        }
+        body {
+        padding-top: 80px;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top">
+    <div class="container-fluid">
+        <!-- Logo Section -->
+        <div class="navbar-brand">
+            <img src="/images/logo.png" alt="Logo" width="40" height="40" style="margin-right: 10px;">
+            Footballistics
+        </div>
+
+        <!-- Navbar Links -->
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+                <!-- Home Icon Button -->
+                <a class="nav-link active" aria-current="page" href="/">
+                    <i class="bi bi-house-door fs-4"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+<div class="container mt-5">
+
+    <h3 class="text-center">Results for <span th:text="${scorer}"></span></h3>
+
+    <!-- Scorer Statistics Table -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Scorer Statistics</h4>
+                        <table class="table table-bordered table-striped mt-4">
+                            <thead class="table-dark">
+                            <tr>
+                                <th>Scorer</th>
+                                <th>First Year</th>
+                                <th>Last Year</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="stat : ${scorerStats}">
+                                <td th:text="${stat.scorer}"></td>
+                                <td th:text="${stat.first_year}"></td>
+                                <td th:text="${stat.last_year}"></td>
+                            </tr>
+
+                            <!-- Display message if the list is empty -->
+                            <tr th:if="${scorerStats.size() == 0}">
+                                <td colspan="3" class="text-center">No results found</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Scorer Match Goals Table -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Scorer Match Goals</h4>
+                        <table class="table table-bordered table-striped mt-4">
+                            <thead class="table-dark">
+                            <tr>
+                                <th>Date</th>
+                                <th>Home Team</th>
+                                <th>Away Team</th>
+                                <th>Player Goals</th>
+                                <th>Total Match Goals</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <!-- Loop through the scorerMatchGoals list -->
+                            <tr th:each="match : ${scorerMatchGoals}">
+                                <td th:text="${match.date}"></td>
+                                <td th:text="${match.home_team}"></td>
+                                <td th:text="${match.away_team}"></td>
+                                <td th:text="${match.player_goals}"></td>
+                                <td th:text="${match.total_goals}"></td>
+                            </tr>
+
+                            <!-- Display message if the list is empty -->
+                            <tr th:if="${scorerMatchGoals.size() == 0}">
+                                <td colspan="5" class="text-center">No results found</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Scorer Team Goals Per Match Table -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Scorer Team Goals Per Match</h4>
+                        <table class="table table-bordered table-striped mt-4">
+                            <thead class="table-dark">
+                            <tr>
+                                <th>Date</th>
+                                <th>Home Team</th>
+                                <th>Away Team</th>
+                                <th>Team</th>
+                                <th>Total Team Goals</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <!-- Loop through the scorerTeamGoalsPerMatch list -->
+                            <tr th:each="teamGoal : ${scorerTeamGoalsPerMatch}">
+                                <td th:text="${teamGoal['date']}"></td>
+                                <td th:text="${teamGoal['home_team']}"></td>
+                                <td th:text="${teamGoal['away_team']}"></td>
+                                <td th:text="${teamGoal['team']}"></td>
+                                <td th:text="${teamGoal['total_team_goals']}"></td>
+                            </tr>
+
+
+                            <!-- Display message if the list is empty -->
+                            <tr th:if="${scorerTeamGoalsPerMatch.size() == 0}">
+                                <td colspan="5" class="text-center">No results found</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scorer Team Goals Per Year Table -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Scorer Team Goals Per Year</h4>
+                        <table class="table table-bordered table-striped mt-4">
+                            <thead class="table-dark">
+                            <tr>
+                                <th>Year</th>
+                                <th>Team</th>
+                                <th>Total Team Goals</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <!-- Loop through the scorerTeamGoalsPerYear list -->
+                            <tr th:each="teamGoal : ${scorerTeamGoalsPerYear}">
+                                <td th:text="${teamGoal['year']}"></td>
+                                <td th:text="${teamGoal['team']}"></td>
+                                <td th:text="${teamGoal['total_team_goals']}"></td>
+                            </tr>
+
+                            <!-- Display message if the list is empty -->
+                            <tr th:if="${scorerTeamGoalsPerYear.size() == 0}">
+                                <td colspan="3" class="text-center">No results found</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Scorer Team Goals Per Year Chart -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Scorer Team Goals Over the Years</h4>
+                        <canvas id="teamGoalsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div th:if="${scorerStats == null}">
+        <p>No statistics found for the selected scorer.</p>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script th:inline="javascript">
+    // Extract Thymeleaf data into JavaScript arrays
+    var years = [];
+    var totalGoals = [];
+    var scorerTeamGoalsPerYear = /*[[${scorerTeamGoalsPerYear}]]*/ [];
+
+    scorerTeamGoalsPerYear.forEach(function(item) {
+        years.push(item.year);
+        totalGoals.push(item.total_team_goals);
+    });
+
+    // Render the chart
+    var ctx = document.getElementById('teamGoalsChart').getContext('2d');
+    var teamGoalsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: years,
+            datasets: [{
+                label: 'Total Team Goals',
+                data: totalGoals,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                tension: 0.2
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Year'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Total Goals'
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+
+</body>
+</html>

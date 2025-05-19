@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Country Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Custom CSS for Navbar -->
+    <style>
+        .navbar-custom {
+            background-color: black; /* background color */
+        }
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link {
+            color: white; /* White text */
+        }
+        .navbar-custom .nav-link:hover {
+            color: #ffcc00; /* Yellow text on hover */
+        }
+
+        /* Custom style for the icon */
+        .navbar-custom .bi-house-door {
+            color: white; /* Change icon color*/
+            font-size: 40px; /* Custom size  */
+        }
+
+        .navbar-custom .nav-link:hover .bi-house-door {
+            color: yellow; /* Change icon color on hover */
+        }
+        body {
+        padding-top: 80px;
+        }
+    </style>
+
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top">
+    <div class="container-fluid">
+        <!-- Logo Section -->
+        <div class="navbar-brand">
+            <img src="/images/logo.png" alt="Logo" width="40" height="40" style="margin-right: 10px;">
+            Footballistics
+        </div>
+
+        <!-- Navbar Links -->
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+                <!-- Home Icon Button -->
+                <a class="nav-link active" aria-current="page" href="/">
+                    <i class="bi bi-house-door fs-4"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+<div class="container mt-5">
+    <h3 class="text-center">Results for <span th:text="${countryName}"></span></h3>
+
+    <!-- Team Statistics Participation Table -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Participation Statistics for <span th:text="${countryName}"></span></h4>
+                        <table class="table table-bordered table-striped mt-4">
+                            <thead class="table-dark">
+                            <tr>
+                                <th>Team</th>
+                                <th>First Year</th>
+                                <th>Last Year</th>
+                                <th>Years Participated</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="team : ${teams}">
+                                <td th:text="${team.team}"></td>
+                                <td th:text="${team.first_year}"></td>
+                                <td th:text="${team.last_year}"></td>
+                                <td th:text="${team.years_participated}"></td>
+                            </tr>
+                            <tr th:if="${teams.isEmpty()}">
+                                <td colspan="4" class="text-center">No results found</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Statistics Country -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Total Statistics for <span th:text="${countryName}"></span></h4>
+                        <table class="table table-bordered table-striped mt-2">
+                            <thead class="table-dark">
+                            <tr>
+                                <th>Total Wins</th>
+                                <th>Total Losses</th>
+                                <th>Total Draws</th>
+                                <th>Total Matches</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td th:text="${totalStats.total_wins}"></td>
+                                <td th:text="${totalStats.total_losses}"></td>
+                                <td th:text="${totalStats.total_draws}"></td>
+                                <td th:text="${totalStats.total_matches}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line Chart Container for Wins ans Losses -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Wins and Losses per Year for <span th:text="${countryName}"></span></h4>
+                        <canvas id="resultsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line Chart Container for Draws -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Draws per Year for <span th:text="${countryName}"></span></h4>
+                        <canvas id="drawsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Line Chart Container for Matches -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Matches per Year for <span th:text="${countryName}"></span></h4>
+                        <canvas id="matchesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Total Home Statistics -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Total Statistics As Home Team</h4>
+                        <table class="table table-bordered table-striped mt-2">
+                            <thead class="table-dark">
+                            <tr>
+                                <th>Total Home Wins</th>
+                                <th>Total Home Losses</th>
+                                <th>Total Home Draws</th>
+                                <th>Total Home Matches</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td th:text="${totalHomeStats.total_wins}"></td>
+                                <td th:text="${totalHomeStats.total_losses}"></td>
+                                <td th:text="${totalHomeStats.total_draws}"></td>
+                                <td th:text="${totalHomeStats.total_matches}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line Chart Container for Home Team Wins and Losses -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Home Team Wins and Losses per Year</h4>
+                        <canvas id="homeWinsLossesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line Chart Container for Home Team Draws -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Home Team Draws per Year</h4>
+                        <canvas id="homeDrawsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Line Chart Container for Matches For Home Team-->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Home Matches per Year for <span th:text="${countryName}"></span></h4>
+                        <canvas id="homeMatchesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Away Statistics -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Total Statistics As Away Team</h4>
+                        <table class="table table-bordered table-striped mt-2">
+                            <thead class="table-dark">
+                            <tr>
+                                <th>Total Away Wins</th>
+                                <th>Total Away Losses</th>
+                                <th>Total Away Draws</th>
+                                <th>Total Away Matches</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td th:text="${totalAwayStats.total_wins}"></td>
+                                <td th:text="${totalAwayStats.total_losses}"></td>
+                                <td th:text="${totalAwayStats.total_draws}"></td>
+                                <td th:text="${totalAwayStats.total_matches}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line Chart Container for Away Team Wins and Losses -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Away Team Wins and Losses per Year</h4>
+                        <canvas id="awayWinsLossesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line Chart Container for Away Team Draws -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Away Team Draws per Year</h4>
+                        <canvas id="awayDrawsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h4 class="text-center">Away Matches per Year</h4>
+                        <canvas id="awayMatchesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4" th:if="${#lists.size(teams) > 1}">
+        <button class="btn btn-info" onclick="loadExtraStats()">More Details</button>
+    </div>
+
+    <!-- Extra tables container (will be filled dynamically) -->
+    <div id="extraStatsContainer"></div>
+
+
+    <div class="container mt-5">
+        <!-- Year Range Filter -->
+        <div class="mt-4">
+            <h4 class="text-center">Filter Match Results by Year Range</h4>
+            <form id="yearFilterForm" class="text-center">
+                <input type="number" id="startYear" placeholder="Start Year" class="form-control d-inline w-25" required />
+                <input type="number" id="endYear" placeholder="End Year" class="form-control d-inline w-25" required />
+                <button type="button" class="btn btn-primary" onclick="fetchMatchDetails()">Filter</button>
+            </form>
+        </div>
+
+        <!-- Match Details Table Container -->
+        <div class="mt-4" id="matchDetailsContainer">
+            <!-- Match results will be loaded here dynamically -->
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Script for more details -->
+<script>
+    function loadExtraStats() {
+        let button = document.querySelector("button[onclick='loadExtraStats()']");
+        let countryName = "[[${countryName}]]"; // Get the country name from Thymeleaf
+        button.disabled = true; // Disable button while loading
+
+        fetch(`/load-more-stats?countryName=${countryName}`)
+            .then(response => response.json())
+            .then(data => {
+                let extraStatsContainer = document.getElementById("extraStatsContainer");
+                extraStatsContainer.innerHTML = generateExtraStatsHTML(data);
+                button.style.display = "none"; // Hide button after loading
+            })
+            .catch(error => {
+                console.error("Error loading extra statistics:", error);
+                button.disabled = false; // Re-enable button if there's an error
+            });
+    }
+
+    function generateExtraStatsHTML(teams) {
+        if (teams.length === 0) {
+            return `<p class="text-center">No additional statistics available.</p>`;
+        }
+
+        let html = `<div class="container mt-5">
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <div class="card shadow-lg">
+                                    <div class="card-body">
+                                        <h4 class="text-center">Total Statistics for Teams</h4>
+                                        <table class="table table-bordered table-striped mt-4">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>Team</th>
+                                                    <th>Total Wins</th>
+                                                    <th>Total Losses</th>
+                                                    <th>Total Draws</th>
+                                                    <th>Total Matches</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>`;
+
+        teams.forEach(team => {
+            html += `<tr>
+                        <td>${team.team}</td>
+                        <td>${team.wins}</td>
+                        <td>${team.losses}</td>
+                        <td>${team.draws}</td>
+                        <td>${team.total_matches}</td>
+                    </tr>`;
+        });
+
+        html += `</tbody></table></div></div></div></div>`;
+
+        return html;
+    }
+
+</script>
+
+<!-- Script for total line charts -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let countryName = "[[${countryName}]]"; // Get country name from Thymeleaf
+
+        fetch(`/stats-per-year?countryName=${countryName}`)
+            .then(response => response.json())
+            .then(data => {
+                let years = Object.keys(data);
+                let wins = [];
+                let losses = [];
+                let draws = [];
+                let totalMatches = [];
+
+                years.forEach(year => {
+                    let stats = data[year];
+                    wins.push(stats.wins);
+                    losses.push(stats.losses);
+                    draws.push(stats.draws);
+                    totalMatches.push(stats.total_matches);
+                });
+
+                // Chart for Wins and Losses (excluding Draws)
+                let ctxResults = document.getElementById("resultsChart").getContext("2d");
+                new Chart(ctxResults, {
+                    type: "line",
+                    data: {
+                        labels: years,
+                        datasets: [{
+                            label: "Wins",
+                            data: wins,
+                            borderColor: "blue",
+                            backgroundColor: "rgb(0, 0, 255)",
+                            borderWidth: 2,
+                            pointRadius: 2 // Removes points from the line
+                        }, {
+                            label: "Losses",
+                            data: losses,
+                            borderColor: "red",
+                            backgroundColor: "rgb(255, 0, 0)",
+                            borderWidth: 2,
+                            pointRadius: 2 // Removes points from the line
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: "Year"
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: "Count"
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+                // Chart for Matches
+                let ctxMatches = document.getElementById("matchesChart").getContext("2d");
+                new Chart(ctxMatches, {
+                    type: "line",
+                    data: {
+                        labels: years,
+                        datasets: [{
+                            label: "Total Matches",
+                            data: totalMatches,
+                            borderColor: "teal",
+                            backgroundColor: "rgb(0, 128, 128)",
+                            borderWidth: 2,
+                            pointRadius: 2 // Removes points from the line
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: "Year"
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: "Count"
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+                // New Chart for Draws Only
+                let ctxDraws = document.getElementById("drawsChart").getContext("2d");
+                new Chart(ctxDraws, {
+                    type: "line",
+                    data: {
+                        labels: years,
+                        datasets: [{
+                            label: "Draws",
+                            data: draws,
+                            borderColor: "olive",
+                            backgroundColor: "rgb(128, 128, 0)",
+                            borderWidth: 2,
+                            pointRadius: 2 // Removes points from the line
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: "Year"
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: "Count"
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error("Error loading chart data:", error));
+    });
+</script>
+
+
+
+<!-- Script for home and away line charts -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let countryName = "[[${countryName}]]"; // Get country name from Thymeleaf
+
+        // Function to fetch and render line charts (Matches)
+        function fetchAndRenderChart(url, canvasId, label, color) {
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                let years = Object.keys(data);
+                let matches = [];
+
+                years.forEach(year => {
+                    let stats = data[year];
+                    matches.push(stats.total_matches);
+                });
+
+                let ctx = document.getElementById(canvasId).getContext("2d");
+                new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        labels: years,
+                        datasets: [{
+                            label: label,
+                            data: matches,
+                            borderColor: color,
+                            backgroundColor: color,
+                            borderWidth: 2,
+                            pointRadius: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: "Year"
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: "Matches"
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error(`Error loading chart data for ${label}:`, error));
+        }
+
+        // Fetch and render charts for home and away matches
+        fetchAndRenderChart(`/stats-per-year/home?countryName=${countryName}`, "homeMatchesChart", "Home Matches", "teal");
+        fetchAndRenderChart(`/stats-per-year/away?countryName=${countryName}`, "awayMatchesChart", "Away Matches", "teal");
+
+        // Function to fetch and render charts for Home Team Wins and Losses
+        function fetchAndRenderWinsLossesChart(url, canvasId, labelPrefix) {
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                let years = Object.keys(data);
+                let wins = [];
+                let losses = [];
+
+                years.forEach(year => {
+                    let stats = data[year];
+                    wins.push(stats.wins);
+                    losses.push(stats.losses);
+                });
+
+                let ctx = document.getElementById(canvasId).getContext("2d");
+                new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        labels: years,
+                        datasets: [{
+                            label: `${labelPrefix} Wins`,
+                            data: wins,
+                            borderColor: "blue",
+                            backgroundColor: "rgb(0, 0, 255)",
+                            borderWidth: 2,
+                            pointRadius: 2
+                        }, {
+                            label: `${labelPrefix} Losses`,
+                            data: losses,
+                            borderColor: "red",
+                            backgroundColor: "rgb(255, 0, 0)",
+                            borderWidth: 2,
+                            pointRadius: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: "Year"
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: "Count"
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error(`Error loading chart data for ${labelPrefix} Results:`, error));
+        }
+
+        // Function to fetch and render chart for Draws
+        function fetchAndRenderDrawsChart(url, canvasId, labelPrefix) {
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                let years = Object.keys(data);
+                let draws = [];
+
+                years.forEach(year => {
+                    let stats = data[year];
+                    draws.push(stats.draws);
+                });
+
+                let ctx = document.getElementById(canvasId).getContext("2d");
+                new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        labels: years,
+                        datasets: [{
+                            label: `${labelPrefix} Draws`,
+                            data: draws,
+                            borderColor: "olive",
+                            backgroundColor: "rgb(128, 128, 0)",
+                            borderWidth: 2,
+                            pointRadius: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: "Year"
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: "Count"
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error(`Error loading chart data for ${labelPrefix} Draws:`, error));
+        }
+
+        // Fetch and render charts for Home Team Wins and Losses
+        fetchAndRenderWinsLossesChart(`/stats-per-year/home?countryName=${countryName}`, "homeWinsLossesChart", "Home Team");
+
+        // Fetch and render chart for Home Team Draws
+        fetchAndRenderDrawsChart(`/stats-per-year/home?countryName=${countryName}`, "homeDrawsChart", "Home Team");
+
+        // Fetch and render charts for Away Team Wins and Losses
+        fetchAndRenderWinsLossesChart(`/stats-per-year/away?countryName=${countryName}`, "awayWinsLossesChart", "Away Team");
+
+        // Fetch and render chart for Away Team Draws
+        fetchAndRenderDrawsChart(`/stats-per-year/away?countryName=${countryName}`, "awayDrawsChart", "Away Team");
+
+    });
+</script>
+
+
+
+<!-- Script for year range -->
+<script>
+    // Function to fetch and display match details based on the year range filter
+    function fetchMatchDetails() {
+        let countryName = "[[${countryName}]]"; // Get the country name from Thymeleaf
+        let startYear = document.getElementById("startYear").value;
+        let endYear = document.getElementById("endYear").value;
+
+        // Validate the inputs
+        if (startYear && endYear && startYear <= endYear) {
+            // Disable the button while fetching
+            let button = document.querySelector("button[onclick='fetchMatchDetails()']");
+            button.disabled = true;
+
+            // Fetch match details for the given year range
+            fetch(`/match-details?countryName=${countryName}&startYear=${startYear}&endYear=${endYear}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Remove duplicates based on a combination of fields
+                    let uniqueMatches = removeDuplicates(data);
+
+                    // Get the container where the results will be placed
+                    let matchDetailsContainer = document.getElementById("matchDetailsContainer");
+
+                    // Clear any previous results
+                    matchDetailsContainer.innerHTML = "";
+
+                    // Generate the table and add it to the container
+                    if (uniqueMatches.length === 0) {
+                        matchDetailsContainer.innerHTML = "<p class='text-center'>No match details found for the selected year range.</p>";
+                    } else {
+                        matchDetailsContainer.innerHTML = generateMatchDetailsTable(uniqueMatches);
+                    }
+
+                    // Enable the button after fetching is done
+                    button.disabled = false;
+                })
+                .catch(error => {
+                    console.error("Error fetching match details:", error);
+                    button.disabled = false;
+                });
+        } else {
+            alert("Please enter a valid year range.");
+        }
+    }
+
+    // Function to remove duplicates from match data
+    function removeDuplicates(data) {
+        let seenMatches = new Set();
+        let uniqueMatches = [];
+
+        data.forEach(match => {
+            let matchIdentifier = match.date + "_" + match.home_team + "_" + match.away_team;
+            if (!seenMatches.has(matchIdentifier)) {
+                seenMatches.add(matchIdentifier);
+                uniqueMatches.push(match);
+            }
+        });
+
+        return uniqueMatches;
+    }
+
+    // Function to generate HTML for the match details table
+    function generateMatchDetailsTable(data) {
+        let html = `<div class="card shadow-lg">
+                        <div class="card-body">
+                            <h4 class="text-center">Match Details</h4>
+                            <table class="table table-bordered table-striped mt-4">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Home Team</th>
+                                        <th>Away Team</th>
+                                        <th>Home Score</th>
+                                        <th>Away Score</th>
+                                        <th>Tournament</th>
+                                        <th>City</th>
+                                        <th>Neutral</th>
+                                        <th>Final Winner</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+
+        // Loop through the data to create each row of the table
+        data.forEach(match => {
+            html += `<tr>
+                        <td>${match.date}</td>
+                        <td>${match.home_team}</td>
+                        <td>${match.away_team}</td>
+                        <td>${match.home_score}</td>
+                        <td>${match.away_score}</td>
+                        <td>${match.tournament}</td>
+                        <td>${match.city}</td>
+                        <td>${match.neutral}</td>
+                        <td>${match.winner}</td>
+                    </tr>`;
+        });
+
+        html += `</tbody></table></div></div>`;
+
+        return html;
+    }
+</script>
+
+</body>
+</html>
